@@ -1,0 +1,9 @@
+{
+  "pid": 62324,
+  "startedAt": 1783919267761,
+  "command": "dev",
+  "cwd": "/Users/kl/Projects/forum front",
+  "port": 3000,
+  "hostname": "::1",
+  "url": "http://[::1]:3000"
+}

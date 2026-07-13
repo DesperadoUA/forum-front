@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sweeps — Player Complaints Community</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <nav class="navbar">
+        <div class="logo" onclick="app.goHome()">
+            <i class="fas fa-shield-alt"></i>
+            SWEEPS
+        </div>
+        <div class="nav-links">
+            <a href="#" onclick="app.goHome()">Home</a>
+            <a href="#" onclick="app.showRecentComplaints()">Recent</a>
+            <a href="#" onclick="app.showResolvedComplaints()">Resolved</a>
+            <a href="#" onclick="app.dashboard.showDashboard()" id="dashboard-link" style="display: none;">Dashboard</a>
+            <a href="#" onclick="app.showAbout()">About</a>
+        </div>
+        <div class="auth-buttons">
+            <button class="btn-secondary">Log In</button>
+            <button class="btn-primary" onclick="app.openComplaintModal()">
+                <i class="fas fa-bullhorn"></i> File Complaint
+            </button>
+        </div>
+    </nav>
+
+    <header id="main-hero" class="hero-full-width">
+        <div class="hero-content">
+            <h1>Your Voice in Sweepstakes Casinos</h1>
+            <p class="hero-subtitle">Community-driven platform for complaints, reviews, and discussions</p>
+            <div class="hero-stats">
+                <div class="stat-box">
+                    <div class="stat-number" id="total-complaints">0</div>
+                    <div class="stat-label">Total Complaints</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-number" id="resolved-complaints">0</div>
+                    <div class="stat-label">Resolved</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-number" id="active-casinos">0</div>
+                    <div class="stat-label">Active Casinos</div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main id="app-container" class="container">
+        <!-- Dynamic content will be rendered here -->
+    </main>
+
+    <!-- Complaint Modal -->
+    <div id="complaint-modal" class="modal">
+        <div class="modal-content modal-large">
+            <span class="close-btn" onclick="app.closeComplaintModal()">&times;</span>
+            <h2><i class="fas fa-bullhorn"></i> File a Complaint</h2>
+            <p style="color: var(--text-muted); margin-bottom: 25px;">
+                Share your experience to help the community. All personal information will be kept confidential.
+            </p>
+            
+            <form id="complaint-form">
+                <!-- Basic Information -->
+                <div class="form-section">
+                    <h3 class="form-section-title">
+                        <i class="fas fa-info-circle"></i> Basic Information
+                    </h3>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="form-casino">Casino / Sportsbook *</label>
+                            <select id="form-casino" required>
+                                <option value="">Select a casino...</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="form-state">State *</label>
+                            <select id="form-state" required>
+                                <option value="">Select your state...</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="form-issue-type">Type of Issue *</label>
+                        <select id="form-issue-type" required>
+                            <option value="">Select issue type...</option>
+                            <option value="payouts">Payouts and withdrawals (redemption/cashout)</option>
+                            <option value="verification">Verification and KYC/AML</option>
+                            <option value="account">Account: blocking, restrictions, access</option>
+                            <option value="bonuses">Bonuses, promotions, wagering requirements (bonus terms/wagering)</option>
+                            <option value="game">Game malfunction or technical issues</option>
+                            <option value="support">Customer support issues</option>
+                            <option value="payment">Payment processing problems</option>
+                            <option value="other">Other</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <!-- Complaint Details -->
+                <div class="form-section">
+                    <h3 class="form-section-title">
+                        <i class="fas fa-file-alt"></i> Complaint Details
+                    </h3>
+                    
+                    <div class="form-group">
+                        <label for="form-title">Subject *</label>
+                        <input type="text" id="form-title" placeholder="Brief description of your issue" maxlength="100" required>
+                        <small class="form-help">Keep it short and descriptive (max 100 characters)</small>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="form-desc">Complaint *</label>
+                        <textarea id="form-desc" rows="8" placeholder="Provide detailed information about your complaint. Include dates, amounts, and any relevant details..." required></textarea>
+                        <small class="form-help">Be as detailed as possible. This will help others understand your situation.</small>
+                    </div>
+                </div>
+                
+                <!-- Confidential Information -->
+                <div class="form-section confidential-section">
+                    <h3 class="form-section-title">
+                        <i class="fas fa-lock"></i> Confidential Information
+                    </h3>
+                    <div class="privacy-notice">
+                        <i class="fas fa-shield-alt"></i>
+                        <div>
+                            <strong>Privacy Guarantee:</strong> All information in this section will be kept strictly confidential and will NOT be displayed publicly. 
+                            This data is for verification purposes only and may be used to contact you regarding your complaint.
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="form-first-name">Real First Name *</label>
+                            <input type="text" id="form-first-name" placeholder="Your first name" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="form-last-name">Real Last Name *</label>
+                            <input type="text" id="form-last-name" placeholder="Your last name" required>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="form-account-id">Name or ID of the Account Used at This Casino *</label>
+                        <input type="text" id="form-account-id" placeholder="Your username or account ID at the casino" required>
+                        <small class="form-help">This helps verify your account with the casino</small>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="form-email">Email Address Used at the Casino *</label>
+                        <input type="email" id="form-email" placeholder="email@example.com" required>
+                        <small class="form-help">Must match the email registered with the casino</small>
+                    </div>
+                </div>
+                
+                <!-- Evidence Upload -->
+                <div class="form-section">
+                    <h3 class="form-section-title">
+                        <i class="fas fa-paperclip"></i> Upload Evidence (Optional)
+                    </h3>
+                    <div class="privacy-notice">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <div>
+                            <strong>Privacy Warning:</strong> Please ensure any uploaded screenshots or documents do NOT contain:
+                            <ul style="margin: 5px 0 0 20px; padding: 0;">
+                                <li>Full credit card numbers (you may show last 4 digits only)</li>
+                                <li>Social security numbers or tax IDs</li>
+                                <li>Full addresses or phone numbers</li>
+                                <li>Passwords or security codes</li>
+                                <li>Any other sensitive personal information</li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="form-evidence">Upload Files</label>
+                        <div class="file-upload-container">
+                            <input type="file" id="form-evidence" multiple accept="image/*,.pdf" style="display: none;">
+                            <button type="button" class="btn-secondary full-width" onclick="document.getElementById('form-evidence').click()">
+                                <i class="fas fa-upload"></i> Choose Files (Images or PDF)
+                            </button>
+                            <div id="file-list" class="file-list"></div>
+                        </div>
+                        <small class="form-help">Accepted formats: JPG, PNG, GIF, PDF. Max 5 files, 5MB each.</small>
+                    </div>
+                </div>
+                
+                <!-- Terms Agreement -->
+                <div class="form-group">
+                    <label class="checkbox-label">
+                        <input type="checkbox" id="form-terms" required>
+                        <span>I confirm that the information provided is accurate and truthful to the best of my knowledge. I understand that false or misleading information may result in my complaint being removed. *</span>
+                    </label>
+                </div>
+                
+                <div class="form-actions">
+                    <button type="submit" class="btn-primary btn-large">
+                        <i class="fas fa-paper-plane"></i> Continue to Registration
+                    </button>
+                    <button type="button" class="btn-secondary" onclick="app.closeComplaintModal()">
+                        <i class="fas fa-times"></i> Cancel
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Registration Modal -->
+    <div id="registration-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="app.closeRegistrationModal()">&times;</span>
+            <h2><i class="fas fa-user-plus"></i> Create Account</h2>
+            <p style="color: var(--text-muted); margin-bottom: 25px;">
+                To file a complaint, you need to create an account. This helps us verify complaints and prevent spam.
+            </p>
+            
+            <div class="auth-notice">
+                <i class="fas fa-info-circle"></i>
+                <div>
+                    <strong>Already have an account?</strong> 
+                    <a href="#" onclick="app.switchToLogin(event)" style="color: var(--accent-gold); text-decoration: underline;">
+                        Log in here
+                    </a>
+                </div>
+            </div>
+            
+            <form id="registration-form">
+                <div class="form-group">
+                    <label for="reg-username">Username *</label>
+                    <input type="text" id="reg-username" placeholder="Choose a username" required>
+                    <small class="form-help">This will be visible to other users</small>
+                </div>
+                
+                <div class="form-group">
+                    <label for="reg-email">Email Address *</label>
+                    <input type="email" id="reg-email" placeholder="your@email.com" required>
+                    <small class="form-help">For account verification and notifications</small>
+                </div>
+                
+                <div class="form-group">
+                    <label for="reg-password">Password *</label>
+                    <input type="password" id="reg-password" placeholder="Create a strong password" minlength="8" required>
+                    <small class="form-help">Minimum 8 characters</small>
+                </div>
+                
+                <div class="form-group">
+                    <label for="reg-password-confirm">Confirm Password *</label>
+                    <input type="password" id="reg-password-confirm" placeholder="Re-enter your password" required>
+                </div>
+                
+                <div class="form-group">
+                    <label class="checkbox-label">
+                        <input type="checkbox" id="reg-terms" required>
+                        <span>I agree to the <a href="#" onclick="app.showTerms()" style="color: var(--accent-gold);">Terms of Service</a> and <a href="#" onclick="app.showPrivacy()" style="color: var(--accent-gold);">Privacy Policy</a> *</span>
+                    </label>
+                </div>
+                
+                <button type="submit" class="btn-primary full-width btn-large">
+                    <i class="fas fa-check"></i> Create Account
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Login Modal -->
+    <div id="login-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="app.closeLoginModal()">&times;</span>
+            <h2><i class="fas fa-sign-in-alt"></i> Log In</h2>
+            <p style="color: var(--text-muted); margin-bottom: 25px;">
+                Welcome back! Log in to file a complaint.
+            </p>
+            
+            <div class="auth-notice">
+                <i class="fas fa-info-circle"></i>
+                <div>
+                    <strong>Don't have an account?</strong> 
+                    <a href="#" onclick="app.switchToRegistration(event)" style="color: var(--accent-gold); text-decoration: underline;">
+                        Create one here
+                    </a>
+                </div>
+            </div>
+            
+            <form id="login-form">
+                <div class="form-group">
+                    <label for="login-email">Email Address *</label>
+                    <input type="email" id="login-email" placeholder="your@email.com" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="login-password">Password *</label>
+                    <input type="password" id="login-password" placeholder="Enter your password" required>
+                </div>
+                
+                <div style="text-align: right; margin-bottom: 20px;">
+                    <a href="#" onclick="app.showForgotPassword(event)" style="color: var(--text-muted); font-size: 0.875rem;">
+                        Forgot password?
+                    </a>
+                </div>
+                
+                <button type="submit" class="btn-primary full-width btn-large">
+                    <i class="fas fa-sign-in-alt"></i> Log In
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <footer>
+        <div class="footer-content">
+            <div class="footer-section">
+                <h4>About Sweeps</h4>
+                <p>Community-driven platform for sweepstakes casino complaints and reviews.</p>
+            </div>
+            <div class="footer-section">
+                <h4>Quick Links</h4>
+                <ul>
+                    <li><a href="#" onclick="app.goHome()">Home</a></li>
+                    <li><a href="#" onclick="app.showRecentComplaints()">Recent Complaints</a></li>
+                    <li><a href="#" onclick="app.showAllCasinos()">All Casinos</a></li>
+                    <li><a href="#" onclick="app.showAllStates()">Browse by State</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h4>Legal</h4>
+                <ul>
+                    <li><a href="#" onclick="app.showTerms()">Terms of Service</a></li>
+                    <li><a href="#" onclick="app.showPrivacy()">Privacy Policy</a></li>
+                    <li><a href="#" onclick="app.showDisclaimer()">Disclaimer</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h4>Community</h4>
+                <p>Join thousands of players sharing their experiences.</p>
+                <div class="social-links">
+                    <a href="#"><i class="fab fa-twitter"></i></a>
+                    <a href="#"><i class="fab fa-facebook"></i></a>
+                    <a href="#"><i class="fab fa-reddit"></i></a>
+                </div>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2026 Sweeps Complaints Community. Not affiliated with any casino operators.</p>
+            <p class="disclaimer">18+ | Gamble Responsibly | This is a community platform for sharing experiences.</p>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+     <script src="dashboard.js"></script> <!-- ADD THIS LINE -->
+</body>
+</html>
