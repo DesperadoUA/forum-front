@@ -1,9 +1,9 @@
 <template>
-  <div class="state-card" @click="$emit('click')">
+  <NuxtLink :to="`/state/${state.id}`" class="state-card">
     <div class="state-icon"><i class="fas fa-map-marker-alt"></i></div>
     <h3>{{ state.name }}</h3>
     <p>{{ state.casinos }} casinos • {{ state.complaints }} complaints</p>
-  </div>
+  </NuxtLink>
 </template>
 
 <script setup lang="ts">
@@ -15,7 +15,6 @@ interface State {
 }
 
 defineProps<{ state: State }>()
-defineEmits(['click'])
 </script>
 
 <style scoped>

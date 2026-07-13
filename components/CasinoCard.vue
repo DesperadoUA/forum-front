@@ -1,5 +1,5 @@
 <template>
-  <div class="casino-card" @click="$emit('click')">
+  <NuxtLink :to="`/casino/${casino.id}`" class="casino-card">
     <div class="casino-header">
       <div style="display: flex; align-items: center; gap: 15px;">
         <div class="casino-logo" :class="casino.color">
@@ -34,7 +34,7 @@
         <span class="meta-label">Rate</span>
       </div>
     </div>
-  </div>
+  </NuxtLink>
 </template>
 
 <script setup lang="ts">
@@ -50,7 +50,6 @@ interface Casino {
 }
 
 defineProps<{ casino: Casino }>()
-defineEmits(['click'])
 </script>
 
 <style scoped>

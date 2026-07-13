@@ -11,7 +11,6 @@
           v-for="casino in casinos"
           :key="casino.id"
           :casino="casino"
-          @click="$router.push(`/casino/${casino.id}`)"
         />
       </div>
     </div>

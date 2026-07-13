@@ -1,11 +1,11 @@
 <template>
   <div class="page">
     <div class="container content">
-      <Breadcrumbs :items="[{ label: 'Home', to: '/' }, { label: 'Browse by State' }]" />
+      <Breadcrumbs :items="[{ label: 'Home', to: '/' }, { label: 'All States' }]" />
 
       <div>
-        <h1><i class="fas fa-map-marked-alt"></i> Browse by State</h1>
-        <p class="subtitle">Select your state to see available casinos and relevant complaints</p>
+        <h1>All States</h1>
+        <p class="subtitle">{{ states.length }} states available</p>
       </div>
 
       <div class="states-grid">
@@ -13,7 +13,6 @@
           v-for="state in states"
           :key="state.id"
           :state="state"
-          @click="$router.push(`/states/${state.id}`)"
         />
       </div>
     </div>
