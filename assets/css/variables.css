@@ -1,5 +1,6 @@
 :root {
   /* Background */
+  --bg-darker: #0d1117;
   --bg-dark: #121519;
   --bg-card: #1c2128;
   --bg-card-hover: #22272e;

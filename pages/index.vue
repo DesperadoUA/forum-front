@@ -1,5 +1,9 @@
 <template>
   <div>
-    <h1>Sweeps Community</h1>
+    <HeroSection
+      :total-complaints="8"
+      :resolved="3"
+      :active-casinos="8"
+    />
   </div>
 </template>
