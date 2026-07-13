@@ -1,22 +1,24 @@
 <template>
-  <nav class="navbar">
-    <div class="logo">
-      <i class="fas fa-shield-alt"></i>
-      SWEEPS
-    </div>
-    <div class="nav-links">
-      <a href="#">Home</a>
-      <a href="#">Recent</a>
-      <a href="#">Resolved</a>
-      <a href="#">About</a>
-    </div>
-    <div class="auth-buttons">
-      <button class="btn-secondary">Log In</button>
-      <button class="btn-primary">
-        <i class="fas fa-bullhorn"></i> File Complaint
-      </button>
-    </div>
-  </nav>
+  <header class="header-wrapper">
+    <nav class="navbar">
+      <div class="logo">
+        <i class="fas fa-shield-alt"></i>
+        SWEEPS
+      </div>
+      <div class="nav-links">
+        <a href="#">Home</a>
+        <a href="#">Recent</a>
+        <a href="#">Resolved</a>
+        <a href="#">About</a>
+      </div>
+      <div class="auth-buttons">
+        <button class="btn-secondary">Log In</button>
+        <button class="btn-primary">
+          <i class="fas fa-bullhorn"></i> File Complaint
+        </button>
+      </div>
+    </nav>
+  </header>
 </template>
 
 <style scoped>
@@ -24,13 +26,9 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 20px 3%;
-  background-color: var(--bg-dark);
-  border-bottom: 1px solid var(--border);
-  position: sticky;
-  top: 0;
-  z-index: 100;
-  backdrop-filter: blur(10px);
+  padding: 20px var(--container-padding);
+  max-width: var(--container-max-width);
+  margin: 0 auto;
 }
 
 .logo {
@@ -45,6 +43,15 @@
   align-items: center;
   gap: 10px;
   transition: transform var(--transition-fast);
+}
+
+.header-wrapper {
+  background-color: var(--bg-dark);
+  border-bottom: 1px solid var(--border);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  backdrop-filter: blur(10px);
 }
 
 .logo:hover {

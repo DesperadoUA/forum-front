@@ -1,5 +1,5 @@
 <template>
-  <header class="hero-full-width">
+  <section class="hero-full-width">
     <div class="hero-content">
       <h1>Your Voice in Sweepstakes Casinos</h1>
       <p class="hero-subtitle">Community-driven platform for complaints, reviews, and discussions</p>
@@ -18,7 +18,7 @@
         </div>
       </div>
     </div>
-  </header>
+  </section>
 </template>
 
 <script setup lang="ts">

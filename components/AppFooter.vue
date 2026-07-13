@@ -1,5 +1,6 @@
 <template>
   <footer>
+    <div class="container">
     <div class="footer-content">
       <div class="footer-section">
         <h4>About Sweeps</h4>
@@ -36,6 +37,7 @@
       <p>&copy; 2026 Sweeps Complaints Community. Not affiliated with any casino operators.</p>
       <p class="disclaimer">18+ | Gamble Responsibly | This is a community platform for sharing experiences.</p>
     </div>
+    </div>
   </footer>
 </template>
 
@@ -44,15 +46,13 @@ footer {
   background-color: var(--bg-card);
   border-top: 1px solid var(--border);
   padding: 40px 3%;
-  margin-top: 60px;
 }
 
 .footer-content {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
   gap: 40px;
-  max-width: 1400px;
-  margin: 0 auto 30px;
+  margin-bottom: 30px;
 }
 
 .footer-section h4 {
@@ -109,8 +109,6 @@ footer {
   text-align: center;
   padding-top: 30px;
   border-top: 1px solid var(--border);
-  max-width: 1400px;
-  margin: 0 auto;
 }
 
 .footer-bottom p {

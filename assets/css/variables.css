@@ -27,6 +27,10 @@
   --logo-gradient: linear-gradient(180deg, #f5d683 0%, #c49646 100%);
   --border: #30363d;
 
+  /* Container */
+  --container-max-width: 1400px;
+  --container-padding: 3%;
+
   /* Spacing */
   --spacing-xs: 0.5rem;
   --spacing-sm: 1rem;
