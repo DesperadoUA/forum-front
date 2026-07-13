@@ -24,25 +24,8 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 
-interface Category {
-  id: string
-  name: string
-  icon: string
-}
-
-interface Complaint {
-  title: string
-  user: string
-  date: string
-  stateName: string
-  status: 'open' | 'resolved' | 'investigating'
-  category: Category
-}
-
-interface Casino {
-  id: string
-  name: string
-}
+import type { Complaint } from '~/types/complaint'
+import type { Casino } from '~/types/casino'
 
 const props = defineProps<{
   complaint: Complaint

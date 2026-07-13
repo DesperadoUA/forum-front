@@ -19,12 +19,7 @@
 </template>
 
 <script setup lang="ts">
-interface Casino {
-  name: string
-  type: string
-  rating: number
-  providers: string[]
-}
+import type { Casino } from '~/types/casino'
 
 defineProps<{
   casino: Casino

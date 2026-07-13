@@ -12,14 +12,14 @@
 
     <!-- Replies -->
     <div class="thread-replies">
-      <h2><i class="fas fa-comments"></i> {{ complaint.replies.length }} Replies</h2>
+      <h2><i class="fas fa-comments"></i> {{ (complaint.replies ?? []).length }} Replies</h2>
 
-      <div v-if="complaint.replies.length === 0" class="empty-state">
+      <div v-if="!complaint.replies?.length" class="empty-state">
         <p>No replies yet. Be the first to respond.</p>
       </div>
 
       <ComplaintPost
-        v-for="reply in complaint.replies"
+        v-for="reply in (complaint.replies ?? [])"
         :key="reply.id"
         :user="reply.user"
         :date="reply.date"
@@ -37,35 +37,20 @@
 
 <script setup lang="ts">
 import { ref } from 'vue'
-
-interface Reply {
-  id: number
-  user: string
-  role: string
-  date: string
-  text: string
-  upvotes: number
-}
-
-interface Complaint {
-  user: string
-  date: string
-  text: string
-  upvotes: number
-  replies: Reply[]
-}
+import type { Complaint } from '~/types/complaint'
 
 const props = defineProps<{
   complaint: Complaint
 }>()
 
-const formRef = ref<HTMLElement | null>(null)
+const formRef = ref<{ $el: HTMLElement } | null>(null)
 
 function scrollToForm() {
   formRef.value?.$el?.scrollIntoView({ behavior: 'smooth', block: 'center' })
 }
 
 function addReply(text: string) {
+  if (!props.complaint.replies) return
   props.complaint.replies.push({
     id: props.complaint.replies.length + 1,
     user: 'You',

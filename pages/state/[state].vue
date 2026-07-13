@@ -49,6 +49,7 @@
 
 <script setup lang="ts">
 import { ref, computed } from 'vue'
+import type { Complaint } from '~/types/complaint'
 
 const route = useRoute()
 const state_id = route.params.state as string
@@ -117,7 +118,7 @@ const state = statesData[state_id] ?? { name: state_id, casinos: 0, casinoList: 
 
 const sortBy = ref('newest')
 
-const complaints: { id: number; casinoId: string; stateId: string; category: { id: string; name: string; icon: string }; title: string; text: string; status: 'open' | 'resolved' | 'investigating'; date: string; upvotes: number; user: string; replies: unknown[]; casino: { id: string; name: string; color: string; rating: number } }[] = [
+const complaints: Complaint[] = [
   {
     id: 1, casinoId: 'funrize', stateId: 'CA',
     category: { id: 'withdrawal', name: 'Withdrawal Issues', icon: 'fa-money-bill-wave' },

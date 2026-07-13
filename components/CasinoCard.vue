@@ -38,16 +38,7 @@
 </template>
 
 <script setup lang="ts">
-interface Casino {
-  id: string
-  name: string
-  type: string
-  color: string
-  offer: string
-  stars: number
-  complaints: number
-  resolved: number
-}
+import type { Casino } from '~/types/casino'
 
 defineProps<{ casino: Casino }>()
 </script>

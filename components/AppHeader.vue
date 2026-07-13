@@ -9,7 +9,7 @@
         <NuxtLink to="/">Home</NuxtLink>
         <NuxtLink to="/casinos">Casinos</NuxtLink>
         <a href="#">Recent</a>
-        <a href="#">Resolved</a>
+        <NuxtLink to="/resolved">Resolved</NuxtLink>
         <a href="#">About</a>
       </div>
       <div class="auth-buttons">

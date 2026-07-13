@@ -40,38 +40,14 @@
 </template>
 
 <script setup lang="ts">
-interface Category {
-  id: string
-  name: string
-  icon: string
-}
-
-interface Complaint {
-  id: number
-  casinoId: string
-  stateId: string
-  category?: Category
-  title: string
-  text: string
-  status: 'open' | 'resolved' | 'investigating'
-  date: string
-  upvotes: number
-  user: string
-  replies?: unknown[]
-}
-
-interface Casino {
-  id: string
-  name: string
-  color: string
-  rating: number
-}
+import type { Complaint, ComplaintCategory } from '~/types/complaint'
+import type { Casino } from '~/types/casino'
 
 const props = defineProps<{
   complaint: Complaint
   casino?: Casino
   stateName?: string
-  category?: Category
+  category?: ComplaintCategory
 }>()
 
 

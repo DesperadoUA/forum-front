@@ -30,22 +30,7 @@
 
 <script setup lang="ts">
 import { ref } from 'vue'
-
-interface Complaint {
-  id: number
-  casinoId: string
-  stateId: string
-  category?: { id: string; name: string; icon: string }
-  title: string
-  text: string
-  status: 'open' | 'resolved' | 'investigating'
-  date: string
-  upvotes: number
-  user: string
-  replies?: unknown[]
-  casino?: { id: string; name: string; color: string; rating: number }
-  stateName?: string
-}
+import type { Complaint } from '~/types/complaint'
 
 const sortBy = ref('newest')
 const searchQuery = ref('')
