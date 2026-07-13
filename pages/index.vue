@@ -13,13 +13,7 @@
       <div class="container">
         <div class="recent-header">
           <h2>Recent Complaints</h2>
-          <select v-model="sortBy" class="sort-select">
-            <option value="newest">Newest First</option>
-            <option value="oldest">Oldest First</option>
-            <option value="mostVoted">Most Upvoted</option>
-            <option value="open">Open Only</option>
-            <option value="resolved">Resolved Only</option>
-          </select>
+          <SortSelect v-model="sortBy" />
         </div>
         <ComplaintCard
           v-for="complaint in complaints"
@@ -35,9 +29,11 @@
 </template>
 
 <script setup lang="ts">
+import { ref } from 'vue'
+
 const sortBy = ref('newest')
 const searchQuery = ref('')
-const complaints = ref([
+const complaints = [
   {
     id: 1, casinoId: 'funrize', stateId: 'CA', category: { id: 'withdrawal', name: 'Withdrawal Issues', icon: 'fa-money-bill-wave' },
     title: 'Withdrawal Delayed Over 3 Weeks', text: 'Documents uploaded 3 days ago, still pending review. Support keeps giving me the runaround. This is completely unacceptable.',
@@ -86,7 +82,7 @@ const complaints = ref([
     status: 'investigating', date: '2026-02-08', upvotes: 19, user: 'Chris W.', replies: [{}],
     casino: { id: 'sportzino', name: 'Sportzino', color: 'bg-green', rating: 7.7 }, stateName: 'Ohio',
   },
-])
+]
 </script>
 
 <style scoped>
@@ -97,13 +93,4 @@ const complaints = ref([
   margin-bottom: 20px;
 }
 
-.sort-select {
-  background: var(--bg-card);
-  color: var(--text-main);
-  border: 1px solid var(--border);
-  padding: 10px 15px;
-  border-radius: var(--radius-sm);
-  font-family: 'Chakra Petch', sans-serif;
-  cursor: pointer;
-}
 </style>
