@@ -1,12 +1,13 @@
 <template>
   <header class="header-wrapper">
     <nav class="navbar">
-      <div class="logo">
+      <NuxtLink to="/" class="logo">
         <i class="fas fa-shield-alt"></i>
         SWEEPS
-      </div>
+      </NuxtLink>
       <div class="nav-links">
-        <a href="#">Home</a>
+        <NuxtLink to="/">Home</NuxtLink>
+        <NuxtLink to="/casinos">Casinos</NuxtLink>
         <a href="#">Recent</a>
         <a href="#">Resolved</a>
         <a href="#">About</a>

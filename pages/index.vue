@@ -90,13 +90,6 @@ const complaints = ref([
 </script>
 
 <style scoped>
-.page {
-  display: flex;
-  flex-direction: column;
-  gap: 40px;
-  padding-bottom: 40px;
-}
-
 .recent-header {
   display: flex;
   justify-content: space-between;

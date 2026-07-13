@@ -16,8 +16,10 @@
 </template>
 
 <script setup lang="ts">
+const router = useRouter()
+
 const categories = [
-  { id: 'casinos', icon: 'fa-dice', title: 'All Casinos', description: 'Browse complete list', onClick: () => {} },
+  { id: 'casinos', icon: 'fa-dice', title: 'All Casinos', description: 'Browse complete list', onClick: () => router.push('/casinos') },
   { id: 'states', icon: 'fa-map-marked-alt', title: 'By State', description: 'Find legal sites', onClick: () => {} },
   { id: 'games', icon: 'fa-gamepad', title: 'By Game', description: 'Find specific games', onClick: () => {} },
   { id: 'providers', icon: 'fa-server', title: 'By Provider', description: 'Software providers', onClick: () => {} },
