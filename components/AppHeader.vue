@@ -13,7 +13,7 @@
         <a href="#">About</a>
       </div>
       <div class="auth-buttons">
-        <button class="btn-secondary">Log In</button>
+        <button class="btn-secondary" @click="openLogin">Log In</button>
         <button class="btn-primary">
           <i class="fas fa-bullhorn"></i> File Complaint
         </button>
@@ -21,6 +21,11 @@
     </nav>
   </header>
 </template>
+
+<script setup lang="ts">
+import { useLoginModal } from '~/composables/useLoginModal'
+const { open: openLogin } = useLoginModal()
+</script>
 
 <style scoped>
 .navbar {
@@ -39,6 +44,7 @@
   cursor: pointer;
   background: var(--logo-gradient);
   -webkit-background-clip: text;
+  background-clip: text;
   -webkit-text-fill-color: transparent;
   display: flex;
   align-items: center;
