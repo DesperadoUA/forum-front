@@ -1,5 +1,5 @@
 <template>
-  <div class="complaint-card-row" @click="$emit('click')">
+  <NuxtLink :to="`/complaint/${complaint.id}`" class="complaint-card-row">
     <div class="comp-status-panel" :class="statusClass">
       <i :class="`fas ${statusIcon}`"></i>
       <span class="comp-status-text">{{ statusLabel }}</span>
@@ -36,30 +36,28 @@
       <div class="comp-target-name">{{ casino?.name ?? 'Unknown' }}</div>
       <div class="comp-safety-index">Rating: <strong>{{ casino?.rating ?? 'N/A' }}/10</strong></div>
     </div>
-  </div>
+  </NuxtLink>
 </template>
 
 <script setup lang="ts">
-interface Reply {
-  id: number
-  user: string
-  date: string
-  text: string
-  upvotes: number
+interface Category {
+  id: string
+  name: string
+  icon: string
 }
 
 interface Complaint {
   id: number
   casinoId: string
   stateId: string
-  category: string
+  category?: Category
   title: string
   text: string
   status: 'open' | 'resolved' | 'investigating'
   date: string
   upvotes: number
   user: string
-  replies?: Reply[]
+  replies?: unknown[]
 }
 
 interface Casino {
@@ -69,12 +67,6 @@ interface Casino {
   rating: number
 }
 
-interface Category {
-  id: string
-  name: string
-  icon: string
-}
-
 const props = defineProps<{
   complaint: Complaint
   casino?: Casino
@@ -82,7 +74,6 @@ const props = defineProps<{
   category?: Category
 }>()
 
-defineEmits(['click'])
 
 const statusClass = computed(() => ({
   'bg-status-open': props.complaint.status === 'open',

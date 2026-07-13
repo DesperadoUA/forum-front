@@ -31,9 +31,25 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 
+interface Complaint {
+  id: number
+  casinoId: string
+  stateId: string
+  category?: { id: string; name: string; icon: string }
+  title: string
+  text: string
+  status: 'open' | 'resolved' | 'investigating'
+  date: string
+  upvotes: number
+  user: string
+  replies?: unknown[]
+  casino?: { id: string; name: string; color: string; rating: number }
+  stateName?: string
+}
+
 const sortBy = ref('newest')
 const searchQuery = ref('')
-const complaints = [
+const complaints: Complaint[] = [
   {
     id: 1, casinoId: 'funrize', stateId: 'CA', category: { id: 'withdrawal', name: 'Withdrawal Issues', icon: 'fa-money-bill-wave' },
     title: 'Withdrawal Delayed Over 3 Weeks', text: 'Documents uploaded 3 days ago, still pending review. Support keeps giving me the runaround. This is completely unacceptable.',
