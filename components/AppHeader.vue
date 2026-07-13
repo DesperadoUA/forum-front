@@ -13,7 +13,10 @@
         <a href="#">About</a>
       </div>
       <div class="auth-buttons">
-        <button class="btn-secondary" @click="openLogin">Log In</button>
+        <NuxtLink v-if="isLoggedIn" to="/dashboard" class="btn-secondary">
+          <i class="fas fa-user"></i> My Dashboard
+        </NuxtLink>
+        <button v-else class="btn-secondary" @click="openLogin">Log In</button>
         <button class="btn-primary" @click="handleFileComplaint">
           <i class="fas fa-bullhorn"></i> File Complaint
         </button>
@@ -26,6 +29,7 @@
 import { useLoginModal } from '~/composables/useLoginModal'
 import { useComplaintModal } from '~/composables/useComplaintModal'
 import { useAuth } from '~/composables/useAuth'
+
 
 const { open: openLogin } = useLoginModal()
 const { open: openComplaint } = useComplaintModal()
