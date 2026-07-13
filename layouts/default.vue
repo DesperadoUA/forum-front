@@ -13,6 +13,7 @@
       @close="register.close"
       @switch-to-login="switchToLogin"
     />
+    <ComplaintFormModal />
   </div>
 </template>
 
