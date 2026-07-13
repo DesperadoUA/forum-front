@@ -26,6 +26,7 @@
         :casino="casino"
         :state-name="complaint.stateName"
         :category="complaint.category"
+        @click="$router.push(`/complaint/${complaint.id}`)"
       />
     </div>
   </div>
