@@ -1,22 +1,28 @@
 <template>
   <div class="page">
     <HeroSection
-      :total-complaints="8"
-      :resolved="6"
-      :active-casinos="4"
+      :total-complaints="page?.complaints_count ?? 0"
+      :resolved="page?.resolved_count ?? 0"
+      :active-casinos="page?.active_casinos ?? 0"
     />
     <BrowseCategories />
-    <div class="container">
-      <SearchBar v-model="searchQuery" />
-    </div>
     <section class="recent-section">
       <div class="container">
         <div class="recent-header">
           <h2>Recent Complaints</h2>
-          <SortSelect v-model="sortBy" />
+          <div class="recent-header__filters">
+            <SortSelect v-model="sortBy" />
+            <span class="todo-badge">TODO: implement filter</span>
+          </div>
         </div>
+
+        <p v-if="pending" class="status-msg">Loading...</p>
+        <p v-else-if="error" class="status-msg">
+          Failed to load data. Make sure API is running on port 3000.
+        </p>
+
         <ComplaintCard
-          v-for="complaint in complaints"
+          v-for="complaint in sortedComplaints"
           :key="complaint.id"
           :complaint="complaint"
           :casino="complaint.casino"
@@ -29,61 +35,40 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
+import type { ApiResponse, MainPageBody } from '~/types/api/main'
 import type { Complaint } from '~/types/complaint'
+import { mapApiComplaint } from '~/utils/mapComplaint'
 
+const config = useRuntimeConfig()
 const sortBy = ref('newest')
-const searchQuery = ref('')
-const complaints: Complaint[] = [
-  {
-    id: 1, casinoId: 'funrize', stateId: 'CA', category: { id: 'withdrawal', name: 'Withdrawal Issues', icon: 'fa-money-bill-wave' },
-    title: 'Withdrawal Delayed Over 3 Weeks', text: 'Documents uploaded 3 days ago, still pending review. Support keeps giving me the runaround. This is completely unacceptable.',
-    status: 'open', date: '2026-02-15', upvotes: 24, user: 'John D.', replies: [{}, {}, {}],
-    casino: { id: 'funrize', name: 'Funrize', color: 'bg-purple', rating: 8.5 }, stateName: 'California',
-  },
-  {
-    id: 2, casinoId: 'stake-us', stateId: 'TX', category: { id: 'game', name: 'Game Malfunction', icon: 'fa-bug' },
-    title: 'Game Froze During Big Win', text: 'ETH transaction confirmed on blockchain but not in account. Support fixed it in 2 hours after I opened a ticket.',
-    status: 'resolved', date: '2026-02-14', upvotes: 42, user: 'Sarah M.', replies: [{}, {}, {}],
-    casino: { id: 'stake-us', name: 'Stake.us', color: 'bg-black', rating: 8.2 }, stateName: 'Texas',
-  },
-  {
-    id: 3, casinoId: 'chumba', stateId: 'NY', category: { id: 'verification', name: 'Account Verification', icon: 'fa-id-card' },
-    title: 'KYC Verification Taking Forever', text: 'Account verification process is ridiculous. They keep asking for more documents even though I provided everything.',
-    status: 'open', date: '2026-02-13', upvotes: 31, user: 'Mike R.', replies: [{}, {}],
-    casino: { id: 'chumba', name: 'Chumba Casino', color: 'bg-blue', rating: 8.7 }, stateName: 'New York',
-  },
-  {
-    id: 4, casinoId: 'wowvegas', stateId: 'FL', category: { id: 'bonus', name: 'Bonus/Promotion', icon: 'fa-gift' },
-    title: 'Welcome Bonus Not Applied', text: 'Password reset link was broken. Now working after contacting support via email.',
-    status: 'resolved', date: '2026-02-12', upvotes: 18, user: 'Emily K.', replies: [{}, {}],
-    casino: { id: 'wowvegas', name: 'WOW Vegas', color: 'bg-gold', rating: 7.8 }, stateName: 'Florida',
-  },
-  {
-    id: 5, casinoId: 'pulsz', stateId: 'CA', category: { id: 'support', name: 'Customer Support', icon: 'fa-headset' },
-    title: 'Customer Service Non-Responsive', text: 'No response to emails for 2 weeks. Finally got through via live chat.',
-    status: 'investigating', date: '2026-02-11', upvotes: 27, user: 'David L.', replies: [{}, {}],
-    casino: { id: 'pulsz', name: 'Pulsz', color: 'bg-purple', rating: 7.9 }, stateName: 'California',
-  },
-  {
-    id: 6, casinoId: 'mcluck', stateId: 'TX', category: { id: 'payment', name: 'Payment Processing', icon: 'fa-credit-card' },
-    title: 'Skrill Withdrawal Failed', text: 'Skrill transfer failed twice without reason. Still waiting for resolution.',
-    status: 'open', date: '2026-02-10', upvotes: 22, user: 'Lisa T.', replies: [{}],
-    casino: { id: 'mcluck', name: 'McLuck', color: 'bg-green', rating: 7.5 }, stateName: 'Texas',
-  },
-  {
-    id: 7, casinoId: 'fliff', stateId: 'IL', category: { id: 'bonus', name: 'Bonus/Promotion', icon: 'fa-gift' },
-    title: 'Bonus Terms Not Clear', text: 'Wagering requirements were not clearly stated. Had to contact support for clarification.',
-    status: 'resolved', date: '2026-02-09', upvotes: 15, user: 'Robert P.', replies: [{}],
-    casino: { id: 'fliff', name: 'Fliff Social Sports', color: 'bg-blue', rating: 8.3 }, stateName: 'Illinois',
-  },
-  {
-    id: 8, casinoId: 'sportzino', stateId: 'OH', category: { id: 'game', name: 'Game Malfunction', icon: 'fa-bug' },
-    title: 'Bet Not Credited Properly', text: 'Winning bet on NFL game was not credited to my account. Still in dispute.',
-    status: 'investigating', date: '2026-02-08', upvotes: 19, user: 'Chris W.', replies: [{}],
-    casino: { id: 'sportzino', name: 'Sportzino', color: 'bg-green', rating: 7.7 }, stateName: 'Ohio',
-  },
-]
+
+const { data, pending, error } = await useFetch<ApiResponse<MainPageBody>>('/pages/main', {
+  baseURL: config.public.apiBase as string,
+  query: { complaints_limit: 10 },
+  key: 'main-page',
+})
+
+const page = computed(() => data.value?.body)
+
+const complaints = computed<Complaint[]>(() =>
+  page.value?.complaints.map(mapApiComplaint) ?? [],
+)
+
+const sortedComplaints = computed(() => {
+  const list = [...complaints.value]
+  if (sortBy.value === 'newest') return list.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
+  if (sortBy.value === 'oldest') return list.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
+  if (sortBy.value === 'mostVoted') return list.sort((a, b) => b.upvotes - a.upvotes)
+  if (sortBy.value === 'open') return list.filter(c => c.status === 'open')
+  if (sortBy.value === 'resolved') return list.filter(c => c.status === 'resolved')
+  return list
+})
+
+useSeoMeta({
+  title: () => page.value?.seo_title ?? 'Sweeps',
+  description: () => page.value?.seo_description ?? '',
+})
 </script>
 
 <style scoped>
@@ -94,4 +79,26 @@ const complaints: Complaint[] = [
   margin-bottom: 20px;
 }
 
+.recent-header__filters {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.todo-badge {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--accent-gold);
+  border: 1px dashed var(--accent-gold);
+  padding: 6px 10px;
+  border-radius: var(--radius-sm);
+  white-space: nowrap;
+}
+
+.status-msg {
+  color: var(--text-muted);
+  padding: 20px 0;
+}
 </style>

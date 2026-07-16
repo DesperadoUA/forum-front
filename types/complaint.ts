@@ -19,6 +19,7 @@ export interface ComplaintReply {
 
 export interface Complaint {
   id: number
+  slug?: string
   casinoId: string
   stateId: string
   category?: ComplaintCategory
@@ -28,6 +29,7 @@ export interface Complaint {
   date: string
   upvotes: number
   user: string
+  repliesCount?: number
   replies?: ComplaintReply[]
   casino?: Casino
   stateName?: string

@@ -1,5 +1,5 @@
 <template>
-  <NuxtLink :to="`/complaint/${complaint.id}`" class="complaint-card-row">
+  <NuxtLink :to="`/complaint/${complaint.slug ?? complaint.id}`" class="complaint-card-row">
     <div class="comp-status-panel" :class="statusClass">
       <i :class="`fas ${statusIcon}`"></i>
       <span class="comp-status-text">{{ statusLabel }}</span>
@@ -24,7 +24,7 @@
       </div>
       <div class="comp-footer">
         <span><i class="fas fa-thumbs-up"></i> {{ complaint.upvotes }} upvotes</span>
-        <span><i class="fas fa-comment"></i> {{ complaint.replies?.length ?? 0 }} replies</span>
+        <span><i class="fas fa-comment"></i> {{ complaint.repliesCount ?? complaint.replies?.length ?? 0 }} replies</span>
         <span><i class="fas fa-user"></i> {{ complaint.user }}</span>
       </div>
     </div>
