@@ -10,7 +10,7 @@
         <NuxtLink to="/casinos">Casinos</NuxtLink>
         <a href="#">Recent</a>
         <NuxtLink to="/resolved">Resolved</NuxtLink>
-        <a href="#">About</a>
+        <NuxtLink to="/about">About</NuxtLink>
       </div>
       <div class="auth-buttons">
         <NuxtLink v-if="isLoggedIn" to="/dashboard" class="btn-secondary">

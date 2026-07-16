@@ -7,12 +7,7 @@
 </template>
 
 <script setup lang="ts">
-interface State {
-  id: string
-  name: string
-  casinos: number
-  complaints: number
-}
+import type { State } from '~/types/state'
 
 defineProps<{ state: State }>()
 </script>

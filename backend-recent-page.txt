@@ -1,0 +1,128 @@
+Ожидания фронта от бэка для страницы /recent
+================================================
+
+Эндпоинт
+--------
+GET /pages/recent
+
+По аналогии с уже работающими:
+  GET /pages/main
+  GET /pages/states
+  GET /pages/casinos
+  GET /pages/about
+
+
+Формат ответа
+-------------
+{
+  "errors": [],
+  "status": "ok",
+  "body": {
+    "seo_title": "Recent Complaints | Sweeps",
+    "seo_description": "...",
+    "seo_h1": "Recent Complaints",
+    "complaints_count": 8,
+    "complaints": [ ... ]
+  }
+}
+
+При ошибке — как на остальных pages:
+{
+  "errors": ["PAGES_NOT_FOUND"],
+  "status": "error",
+  "body": null
+}
+
+
+Поля body
+---------
+seo_title       — для <title>
+seo_description — для meta description
+seo_h1          — заголовок на странице ("Recent Complaints")
+complaints_count — число для подзаголовка (опционально, можно считать на фронте из массива)
+complaints      — массив жалоб
+
+
+Формат одной жалобы (complaints[])
+----------------------------------
+Тот же объект, что уже отдаёт GET /complaints и GET /pages/main:
+
+{
+  "id": 8,
+  "slug": "bet-not-credited-properly",
+  "title": "Bet Not Credited Properly",
+  "content": "...",
+  "created_at": "2026-07-15T08:42:14.584Z",
+  "date": "2026-07-15",
+  "status": "open" | "resolved" | "investigating",
+  "issue_type": "game",
+  "category": {
+    "id": "game",
+    "name": "Game Malfunction",
+    "icon": "fa-bug"
+  },
+  "upvotes": 0,
+  "replies_count": 0,
+  "user": {
+    "login": "chris_w",
+    "display_name": "Chris W"
+  },
+  "casino": {
+    "slug": "sportzino",
+    "title": "Sportzino",
+    "rating": 7.7,
+    "color": "bg-green",
+    "type": "sportsbook"
+  },
+  "state": {
+    "slug": "ohio",
+    "title": "Ohio"
+  }
+}
+
+
+Логика данных
+-------------
+Recent = все жалобы, отсортированные по дате (новые первые).
+
+По умолчанию бэк отдаёт complaints отсортированными по date/created_at DESC.
+
+Фильтрацию и сортировку из SortSelect фронт делает сам на клиенте:
+  - newest      — по date DESC (дефолт с бэка)
+  - oldest      — по date ASC
+  - mostVoted   — по upvotes DESC
+  - open        — status === "open"
+  - resolved    — status === "resolved"
+
+Query-параметры на бэке для /pages/recent НЕ обязательны.
+Если захочешь вынести сортировку на бэк — опционально:
+  ?sort=newest|oldest|mostVoted
+  ?status=open|resolved|investigating
+
+
+Что НЕ нужно
+------------
+- Отдельный эндпоинт для каждой сортировки
+- Пагинация на первом этапе (можно добавить позже через ?page=&limit=)
+
+
+---
+Бонус: страница /resolved (если будешь делать сразу)
+====================================================
+
+GET /pages/resolved
+
+{
+  "errors": [],
+  "status": "ok",
+  "body": {
+    "seo_title": "Resolved Complaints | Sweeps",
+    "seo_description": "...",
+    "seo_h1": "Resolved Complaints",
+    "resolved_count": 3,
+    "complaints": [ ... только status: "resolved" ... ]
+  }
+}
+
+По HTML-макету на resolved нет SortSelect — только список resolved-жалоб.
+Сортировка по дате DESC на бэке достаточна.
