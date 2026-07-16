@@ -11,26 +11,26 @@
         </div>
       </div>
     </div>
-    <div class="casino-offer">
+    <div v-if="casino.offer" class="casino-offer">
       <i class="fas fa-gift"></i> {{ casino.offer }}
     </div>
     <div class="casino-stars">
       <template v-for="n in 5" :key="n">
-        <i :class="n <= Math.floor(casino.stars) ? 'fas fa-star' : 'far fa-star'"></i>
+        <i :class="n <= Math.floor(casino.stars ?? 0) ? 'fas fa-star' : 'far fa-star'"></i>
       </template>
-      <span class="stars-label">{{ casino.stars }}/5</span>
+      <span class="stars-label">{{ casino.stars ?? 0 }}/5</span>
     </div>
     <div class="casino-meta">
       <div class="meta-item">
-        <span class="meta-value">{{ casino.complaints }}</span>
+        <span class="meta-value">{{ casino.complaints ?? 0 }}</span>
         <span class="meta-label">Complaints</span>
       </div>
       <div class="meta-item">
-        <span class="meta-value">{{ casino.resolved }}</span>
+        <span class="meta-value">{{ casino.resolved ?? 0 }}</span>
         <span class="meta-label">Resolved</span>
       </div>
       <div class="meta-item">
-        <span class="meta-value">{{ Math.round((casino.resolved / casino.complaints) * 100) }}%</span>
+        <span class="meta-value">{{ resolutionRate }}%</span>
         <span class="meta-label">Rate</span>
       </div>
     </div>
@@ -38,9 +38,17 @@
 </template>
 
 <script setup lang="ts">
+import { computed } from 'vue'
 import type { Casino } from '~/types/casino'
 
-defineProps<{ casino: Casino }>()
+const props = defineProps<{ casino: Casino }>()
+
+const resolutionRate = computed(() => {
+  if (props.casino.resolutionRate != null) return props.casino.resolutionRate
+  const complaints = props.casino.complaints ?? 0
+  if (!complaints) return 0
+  return Math.round(((props.casino.resolved ?? 0) / complaints) * 100)
+})
 </script>
 
 <style scoped>

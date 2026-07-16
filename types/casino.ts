@@ -8,6 +8,7 @@ export interface Casino {
   stars?: number
   complaints?: number
   resolved?: number
+  resolutionRate?: number
   providers?: string[]
   allowedStates?: string[]
 }

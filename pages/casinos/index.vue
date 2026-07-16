@@ -3,10 +3,16 @@
     <div class="container content">
       <Breadcrumbs :items="[{ label: 'Home', to: '/' }, { label: 'All Casinos' }]" />
       <div>
-        <h1>All Sweepstakes Casinos</h1>
-        <p class="count">{{ casinos.length }} casinos available</p>
+        <h1>{{ page?.seo_h1 ?? 'All Sweepstakes Casinos' }}</h1>
+        <p class="count">{{ page?.casinos_count ?? casinos.length }} casinos available</p>
       </div>
-      <div class="casinos-grid">
+
+      <p v-if="pending" class="status-msg">Loading...</p>
+      <p v-else-if="error" class="status-msg">
+        Failed to load data. Make sure API is running on port 3000.
+      </p>
+
+      <div v-else class="casinos-grid">
         <CasinoCard
           v-for="casino in casinos"
           :key="casino.id"
@@ -18,14 +24,29 @@
 </template>
 
 <script setup lang="ts">
-const casinos = [
-  { id: 'funrize', name: 'Funrize', type: 'casino', color: 'bg-purple', offer: '3,600 Entries FREE + 1.225M Coins', stars: 4.5, complaints: 45, resolved: 32 },
-  { id: 'stake-us', name: 'Stake.us', type: 'casino', color: 'bg-black', offer: '25 SC No Deposit Bonus', stars: 4.2, complaints: 38, resolved: 29 },
-  { id: 'chumba', name: 'Chumba Casino', type: 'casino', color: 'bg-blue', offer: '2M GC + 2 SC FREE', stars: 4.5, complaints: 124, resolved: 95 },
-  { id: 'wowvegas', name: 'WOW Vegas', type: 'casino', color: 'bg-gold', offer: '1.75M WOW Coins + 35 SC', stars: 4.0, complaints: 45, resolved: 35 },
-  { id: 'pulsz', name: 'Pulsz', type: 'casino', color: 'bg-purple', offer: '5,000 GC + 2 SC Welcome', stars: 4.0, complaints: 41, resolved: 30 },
-  { id: 'mcluck', name: 'McLuck', type: 'casino', color: 'bg-green', offer: 'Up to 200k GC + 100 SC', stars: 3.8, complaints: 67, resolved: 48 },
-]
+import { computed } from 'vue'
+import type { ApiResponse } from '~/types/api/main'
+import type { CasinosPageBody } from '~/types/api/casinos'
+import type { Casino } from '~/types/casino'
+import { mapApiCasino } from '~/utils/mapCasino'
+
+const config = useRuntimeConfig()
+
+const { data, pending, error } = await useFetch<ApiResponse<CasinosPageBody>>('/pages/casinos', {
+  baseURL: config.public.apiBase as string,
+  key: 'casinos-page',
+})
+
+const page = computed(() => data.value?.body)
+
+const casinos = computed<Casino[]>(() =>
+  page.value?.casinos.map(mapApiCasino) ?? [],
+)
+
+useSeoMeta({
+  title: () => page.value?.seo_title ?? 'All Sweepstakes Casinos',
+  description: () => page.value?.seo_description ?? '',
+})
 </script>
 
 <style scoped>
@@ -45,5 +66,10 @@ const casinos = [
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
   gap: 20px;
+}
+
+.status-msg {
+  color: var(--text-muted);
+  padding: 20px 0;
 }
 </style>
