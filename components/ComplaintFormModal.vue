@@ -5,45 +5,46 @@
         <span class="close-btn" @click="close">&times;</span>
 
         <h2><i class="fas fa-bullhorn"></i> File a Complaint</h2>
-        <p class="subtitle">Share your experience to help the community. All personal information will be kept confidential.</p>
+        <p class="subtitle">Share your experience to help the community.</p>
+
+        <p v-if="errorMsg" class="form-error">{{ errorMsg }}</p>
+        <p v-if="successMsg" class="form-success">{{ successMsg }}</p>
 
         <form @submit.prevent="submit">
-
-          <!-- Basic Information -->
           <div class="form-section">
             <h3 class="form-section-title"><i class="fas fa-info-circle"></i> Basic Information</h3>
             <div class="form-row">
               <div class="form-group">
                 <label>Casino / Sportsbook *</label>
-                <select v-model="form.casino" required>
-                  <option value="">Select a casino...</option>
-                  <option value="funrize">Funrize</option>
-                  <option value="stake-us">Stake.us</option>
-                  <option value="chumba">Chumba Casino</option>
-                  <option value="wowvegas">WOW Vegas</option>
-                  <option value="pulsz">Pulsz</option>
-                  <option value="mcluck">McLuck</option>
+                <select v-model.number="form.casino_id" required :disabled="optionsPending">
+                  <option :value="0" disabled>Select a casino...</option>
+                  <option
+                    v-for="casino in casinos"
+                    :key="casino.id"
+                    :value="casino.id"
+                  >
+                    {{ casino.title }}
+                  </option>
                 </select>
               </div>
               <div class="form-group">
                 <label>State *</label>
-                <select v-model="form.state" required>
-                  <option value="">Select your state...</option>
-                  <option value="CA">California</option>
-                  <option value="TX">Texas</option>
-                  <option value="FL">Florida</option>
-                  <option value="NY">New York</option>
-                  <option value="PA">Pennsylvania</option>
-                  <option value="OH">Ohio</option>
-                  <option value="IL">Illinois</option>
-                  <option value="GA">Georgia</option>
+                <select v-model.number="form.state_id" required :disabled="optionsPending">
+                  <option :value="0" disabled>Select your state...</option>
+                  <option
+                    v-for="state in states"
+                    :key="state.id"
+                    :value="state.id"
+                  >
+                    {{ state.title }}
+                  </option>
                 </select>
               </div>
             </div>
             <div class="form-group">
               <label>Type of Issue *</label>
-              <select v-model="form.issueType" required>
-                <option value="">Select issue type...</option>
+              <select v-model="form.issue_type" required>
+                <option value="" disabled>Select issue type...</option>
                 <option value="payouts">Payouts and withdrawals (redemption/cashout)</option>
                 <option value="verification">Verification and KYC/AML</option>
                 <option value="account">Account: blocking, restrictions, access</option>
@@ -56,103 +57,35 @@
             </div>
           </div>
 
-          <!-- Complaint Details -->
           <div class="form-section">
             <h3 class="form-section-title"><i class="fas fa-file-alt"></i> Complaint Details</h3>
             <div class="form-group">
               <label>Subject *</label>
-              <input v-model="form.title" type="text" placeholder="Brief description of your issue" maxlength="100" required />
+              <input
+                v-model="form.title"
+                type="text"
+                placeholder="Brief description of your issue"
+                maxlength="100"
+                required
+              />
               <small class="form-help">Keep it short and descriptive (max 100 characters)</small>
             </div>
             <div class="form-group">
               <label>Complaint *</label>
-              <textarea v-model="form.description" rows="8" placeholder="Provide detailed information about your complaint. Include dates, amounts, and any relevant details..." required />
+              <textarea
+                v-model="form.content"
+                rows="8"
+                placeholder="Provide detailed information about your complaint. Include dates, amounts, and any relevant details..."
+                required
+              />
               <small class="form-help">Be as detailed as possible. This will help others understand your situation.</small>
             </div>
           </div>
 
-          <!-- Confidential Information -->
-          <div class="form-section confidential-section">
-            <h3 class="form-section-title"><i class="fas fa-lock"></i> Confidential Information</h3>
-            <div class="privacy-notice">
-              <i class="fas fa-shield-alt"></i>
-              <div>
-                <strong>Privacy Guarantee:</strong> All information in this section will be kept strictly confidential and will NOT be displayed publicly.
-                This data is for verification purposes only and may be used to contact you regarding your complaint.
-              </div>
-            </div>
-            <div class="form-row">
-              <div class="form-group">
-                <label>Real First Name *</label>
-                <input v-model="form.firstName" type="text" placeholder="Your first name" required />
-              </div>
-              <div class="form-group">
-                <label>Real Last Name *</label>
-                <input v-model="form.lastName" type="text" placeholder="Your last name" required />
-              </div>
-            </div>
-            <div class="form-group">
-              <label>Name or ID of the Account Used at This Casino *</label>
-              <input v-model="form.accountId" type="text" placeholder="Your username or account ID at the casino" required />
-              <small class="form-help">This helps verify your account with the casino</small>
-            </div>
-            <div class="form-group">
-              <label>Email Address Used at the Casino *</label>
-              <input v-model="form.casinoEmail" type="email" placeholder="email@example.com" required />
-              <small class="form-help">Must match the email registered with the casino</small>
-            </div>
-          </div>
-
-          <!-- Evidence Upload -->
-          <div class="form-section">
-            <h3 class="form-section-title"><i class="fas fa-paperclip"></i> Upload Evidence (Optional)</h3>
-            <div class="privacy-notice">
-              <i class="fas fa-exclamation-triangle"></i>
-              <div>
-                <strong>Privacy Warning:</strong> Please ensure any uploaded screenshots or documents do NOT contain:
-                <ul>
-                  <li>Full credit card numbers (you may show last 4 digits only)</li>
-                  <li>Social security numbers or tax IDs</li>
-                  <li>Full addresses or phone numbers</li>
-                  <li>Passwords or security codes</li>
-                </ul>
-              </div>
-            </div>
-            <div class="form-group">
-              <label>Upload Files</label>
-              <div class="file-upload-container">
-                <input ref="fileInput" type="file" multiple accept="image/*,.pdf" style="display: none;" @change="onFiles" />
-                <button type="button" class="btn-secondary full-width" @click="fileInput?.click()">
-                  <i class="fas fa-upload"></i> Choose Files (Images or PDF)
-                </button>
-                <div class="file-list">
-                  <div v-for="(file, i) in files" :key="i" class="file-item">
-                    <div class="file-item-info">
-                      <i class="fas fa-file"></i>
-                      <span class="file-item-name">{{ file.name }}</span>
-                      <span class="file-item-size">{{ (file.size / 1024).toFixed(0) }} KB</span>
-                    </div>
-                    <button type="button" class="file-remove" @click="removeFile(i)">
-                      <i class="fas fa-times"></i>
-                    </button>
-                  </div>
-                </div>
-              </div>
-              <small class="form-help">Accepted formats: JPG, PNG, GIF, PDF. Max 5 files, 5MB each.</small>
-            </div>
-          </div>
-
-          <!-- Terms -->
-          <div class="form-group">
-            <label class="checkbox-label">
-              <input v-model="form.terms" type="checkbox" required />
-              <span>I confirm that the information provided is accurate and truthful to the best of my knowledge. I understand that false or misleading information may result in my complaint being removed. *</span>
-            </label>
-          </div>
-
           <div class="form-actions">
-            <button type="submit" class="btn-primary">
-              <i class="fas fa-paper-plane"></i> Submit Complaint
+            <button type="submit" class="btn-primary" :disabled="pending || optionsPending">
+              <i class="fas fa-paper-plane"></i>
+              {{ pending ? 'Submitting...' : 'Submit Complaint' }}
             </button>
             <button type="button" class="btn-secondary" @click="close">
               <i class="fas fa-times"></i> Cancel
@@ -165,42 +98,143 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, watch } from 'vue'
+import type { ApiResponse, ApiComplaint } from '~/types/api/main'
+import type { CreateComplaintPayload, SelectOption } from '~/types/api/create-complaint'
 import { useComplaintModal } from '~/composables/useComplaintModal'
+import { useAuth } from '~/composables/useAuth'
+import { useLoginModal } from '~/composables/useLoginModal'
 
-const { isOpen, close } = useComplaintModal()
+const config = useRuntimeConfig()
+const { isOpen, close: closeModal } = useComplaintModal()
+const { accessToken, isLoggedIn, restoreToken } = useAuth()
+const { open: openLogin } = useLoginModal()
 
-const fileInput = ref<HTMLInputElement | null>(null)
-const files = ref<File[]>([])
+const casinos = ref<SelectOption[]>([])
+const states = ref<SelectOption[]>([])
+const optionsPending = ref(false)
+const pending = ref(false)
+const errorMsg = ref('')
+const successMsg = ref('')
 
-const form = ref({
-  casino: '',
-  state: '',
-  issueType: '',
+const emptyForm = (): CreateComplaintPayload => ({
+  casino_id: 0,
+  state_id: 0,
+  issue_type: '',
   title: '',
-  description: '',
-  firstName: '',
-  lastName: '',
-  accountId: '',
-  casinoEmail: '',
-  terms: false,
+  content: '',
 })
 
-function onFiles(e: Event) {
-  const input = e.target as HTMLInputElement
-  if (!input.files) return
-  const added = Array.from(input.files).slice(0, 5 - files.value.length)
-  files.value.push(...added)
-  input.value = ''
+const form = ref(emptyForm())
+
+function resetForm() {
+  form.value = emptyForm()
+  errorMsg.value = ''
+  successMsg.value = ''
 }
 
-function removeFile(index: number) {
-  files.value.splice(index, 1)
+function close() {
+  resetForm()
+  closeModal()
 }
 
-function submit() {
-  // submit logic placeholder
-  close()
+async function loadOptions() {
+  optionsPending.value = true
+  errorMsg.value = ''
+
+  try {
+    const [casinosRes, statesRes] = await Promise.all([
+      $fetch<ApiResponse<SelectOption[]>>('/casinos', {
+        baseURL: config.public.apiBase as string,
+      }),
+      $fetch<ApiResponse<SelectOption[]>>('/states', {
+        baseURL: config.public.apiBase as string,
+      }),
+    ])
+
+    casinos.value = casinosRes.body ?? []
+    states.value = statesRes.body ?? []
+  } catch {
+    errorMsg.value = 'Failed to load casinos/states. Make sure API is running on port 3000.'
+  } finally {
+    optionsPending.value = false
+  }
+}
+
+watch(isOpen, (open) => {
+  if (!open) return
+
+  restoreToken()
+
+  if (!isLoggedIn.value) {
+    closeModal()
+    openLogin()
+    return
+  }
+
+  resetForm()
+  loadOptions()
+})
+
+async function submit() {
+  if (!form.value.casino_id || !form.value.state_id) {
+    errorMsg.value = 'Please select casino and state'
+    return
+  }
+
+  if (!accessToken.value) {
+    closeModal()
+    openLogin()
+    return
+  }
+
+  pending.value = true
+  errorMsg.value = ''
+  successMsg.value = ''
+
+  try {
+    const res = await $fetch<ApiResponse<ApiComplaint>>('/complaints', {
+      baseURL: config.public.apiBase as string,
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${accessToken.value}`,
+      },
+      body: {
+        casino_id: form.value.casino_id,
+        state_id: form.value.state_id,
+        issue_type: form.value.issue_type,
+        title: form.value.title.trim(),
+        content: form.value.content.trim(),
+      } satisfies CreateComplaintPayload,
+    })
+
+    if (res.status !== 'ok' || !res.body) {
+      errorMsg.value = Array.isArray(res.errors) && res.errors.length
+        ? String(res.errors[0])
+        : 'Failed to submit complaint'
+      return
+    }
+
+    successMsg.value = 'Complaint submitted. It will appear after moderation.'
+    const slug = res.body.slug
+
+    setTimeout(() => {
+      close()
+      if (slug) navigateTo(`/complaint/${slug}`)
+    }, 800)
+  } catch (e: unknown) {
+    const err = e as { data?: { errors?: unknown[] }; statusCode?: number }
+    if (err.statusCode === 401 || err.statusCode === 403) {
+      errorMsg.value = 'Session expired. Please log in again.'
+      openLogin()
+      return
+    }
+    errorMsg.value = Array.isArray(err.data?.errors) && err.data.errors.length
+      ? String(err.data.errors[0])
+      : 'Failed to submit complaint'
+  } finally {
+    pending.value = false
+  }
 }
 </script>
 
@@ -239,9 +273,15 @@ function submit() {
   margin-bottom: 25px;
 }
 
-.privacy-notice ul {
-  list-style: disc;
-  margin: 5px 0 0 20px;
-  padding: 0;
+.form-error {
+  color: var(--status-open);
+  margin-bottom: 16px;
+  font-size: 0.875rem;
+}
+
+.form-success {
+  color: var(--status-resolved);
+  margin-bottom: 16px;
+  font-size: 0.875rem;
 }
 </style>

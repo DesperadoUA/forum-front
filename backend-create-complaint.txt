@@ -1,0 +1,34 @@
+Ожидания фронта от бэка: создание жалобы
+================================================
+(актуально под frontend-create-complaint.txt)
+
+Эндпоинты для селектов
+----------------------
+GET /casinos  → { errors, status, body: [{ id, title }] }
+GET /states   → { errors, status, body: [{ id, title }] }
+
+
+Создание
+--------
+POST /complaints
+Authorization: Bearer <accessToken>
+Content-Type: application/json
+
+{
+  "casino_id": 1,
+  "state_id": 2,
+  "issue_type": "payouts",
+  "title": "...",
+  "content": "..."
+}
+
+user_id — только из JWT.
+PII / terms / slug — не передаём.
+is_published=false до модерации.
+
+
+Логин (для Bearer)
+------------------
+POST /auth/login
+{ "loginOrEmail": "...", "password": "..." }
+→ body.accessToken

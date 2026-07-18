@@ -20,9 +20,15 @@
 <script setup lang="ts">
 import { useLoginModal } from '~/composables/useLoginModal'
 import { useRegisterModal } from '~/composables/useRegisterModal'
+import { useAuth } from '~/composables/useAuth'
 
 const login = useLoginModal()
 const register = useRegisterModal()
+const { restoreToken } = useAuth()
+
+onMounted(() => {
+  restoreToken()
+})
 
 function switchToRegister() {
   login.close()

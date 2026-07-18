@@ -1,0 +1,266 @@
+Ожидания фронта от бэка для посадочной страницы штата
+==============================================================
+
+URL на фронте и API
+-------------------
+/state/:slug
+
+Примеры:
+  /state/california
+  /state/texas
+  /state/new-york
+
+slug — тот же, что в GET /pages/states (поле slug).
+
+
+Эндпоинт бэка
+-------------
+GET /state/:slug
+
+Пример:
+  GET /state/california
+
+Список штатов по-прежнему:
+  GET /pages/states
+
+
+Формат ответа
+-------------
+{
+  "errors": [],
+  "status": "ok",
+  "body": {
+    "seo_title": "California Sweepstakes Casinos | Sweeps",
+    "seo_description": "...",
+    "seo_h1": "California",
+    "state": { ... },
+    "casinos_count": 3,
+    "complaints_count": 2,
+    "resolved_count": 0,
+    "resolution_rate": 0,
+    "casinos": [ ... ],
+    "complaints": [ ... ]
+  }
+}
+
+При ошибке:
+{
+  "errors": ["STATE_NOT_FOUND"],
+  "status": "error",
+  "body": null
+}
+
+
+Поля body
+---------
+seo_title        — для <title>
+seo_description  — для meta description
+seo_h1           — заголовок на странице (название штата)
+state            — объект штата (см. ниже)
+casinos_count    — число казино в шапке
+complaints_count — число жалоб в шапке
+resolved_count   — число resolved-жалоб
+resolution_rate  — процент resolved (0–100)
+casinos          — казино, доступные в этом штате
+complaints       — жалобы по этому штату
+
+
+Объект state
+------------
+{
+  "slug": "california",
+  "title": "California"
+}
+
+Поля:
+  slug  — идентификатор в URL
+  title — название штата
+
+
+Массив casinos[]
+----------------
+Тот же формат, что в GET /pages/casinos (для CasinoCard):
+
+[
+  {
+    "slug": "funrize",
+    "title": "Funrize",
+    "type": "casino",
+    "color": "bg-purple",
+    "offer": "3,600 Entries FREE + 1.225M Coins",
+    "rating": 8.5,
+    "stars": 4.5,
+    "complaints_count": 45,
+    "resolved_count": 32,
+    "resolution_rate": 71
+  }
+]
+
+Поля:
+  slug             — для ссылки /casino/:slug
+  title            — название
+  type             — "casino" | "sportsbook"
+  color            — CSS-класс лого (bg-purple, bg-black, ...)
+  offer            — оффер или null
+  rating           — рейтинг /10
+  stars            — звёзды /5
+  complaints_count — число жалоб по казино
+  resolved_count   — число resolved
+  resolution_rate  — процент resolved
+
+
+Массив complaints[]
+-------------------
+Тот же формат, что в GET /pages/main, GET /pages/recent, GET /casino/:slug:
+
+{
+  "id": 1,
+  "slug": "withdrawal-delayed-over-3-weeks",
+  "title": "Withdrawal Delayed Over 3 Weeks",
+  "content": "...",
+  "created_at": "2026-07-15T08:42:14.034Z",
+  "date": "2026-07-15",
+  "status": "open",
+  "issue_type": "payouts",
+  "category": {
+    "id": "payouts",
+    "name": "Withdrawal Issues",
+    "icon": "fa-money-bill-wave"
+  },
+  "upvotes": 24,
+  "replies_count": 3,
+  "user": {
+    "login": "john_d",
+    "display_name": "John D"
+  },
+  "casino": {
+    "slug": "funrize",
+    "title": "Funrize",
+    "rating": 8.5,
+    "color": "bg-purple",
+    "type": "casino"
+  },
+  "state": {
+    "slug": "california",
+    "title": "California"
+  }
+}
+
+Важно: все complaints должны относиться к этому штату (state.slug === :slug).
+
+
+Что рендерит фронт
+------------------
+1. Breadcrumbs: Home > All States > {state.title}
+2. Шапка штата:
+   - название
+   - casinos_count
+   - complaints_count
+   - resolution_rate %
+3. Секция "Casinos Available in {state.title}" — сетка CasinoCard
+4. Секция "Complaints (N)" + SortSelect
+5. Список ComplaintCard
+
+
+Логика на фронте (бэку не обязательно)
+---------------------------------------
+Сортировка жалоб на клиенте, как на /recent и /casino/:slug:
+
+  - newest      — по date DESC
+  - oldest      — по date ASC
+  - mostVoted   — по upvotes DESC
+  - open        — status === "open"
+  - resolved    — status === "resolved"
+
+Query-параметры на бэке НЕ обязательны.
+
+
+Пример полного ответа
+---------------------
+GET /state/california
+
+{
+  "errors": [],
+  "status": "ok",
+  "body": {
+    "seo_title": "California Sweepstakes Casinos | Sweeps",
+    "seo_description": "Browse casinos and complaints in California.",
+    "seo_h1": "California",
+    "state": {
+      "slug": "california",
+      "title": "California"
+    },
+    "casinos_count": 2,
+    "complaints_count": 1,
+    "resolved_count": 0,
+    "resolution_rate": 0,
+    "casinos": [
+      {
+        "slug": "funrize",
+        "title": "Funrize",
+        "type": "casino",
+        "color": "bg-purple",
+        "offer": "3,600 Entries FREE + 1.225M Coins",
+        "rating": 8.5,
+        "stars": 4.5,
+        "complaints_count": 1,
+        "resolved_count": 0,
+        "resolution_rate": 0
+      },
+      {
+        "slug": "pulsz",
+        "title": "Pulsz",
+        "type": "casino",
+        "color": "bg-purple",
+        "offer": "5,000 GC + 2 SC Welcome",
+        "rating": 7.9,
+        "stars": 4.0,
+        "complaints_count": 1,
+        "resolved_count": 0,
+        "resolution_rate": 0
+      }
+    ],
+    "complaints": [
+      {
+        "id": 1,
+        "slug": "withdrawal-delayed-over-3-weeks",
+        "title": "Withdrawal Delayed Over 3 Weeks",
+        "content": "Documents uploaded 3 days ago, still pending review.",
+        "created_at": "2026-07-15T08:42:14.034Z",
+        "date": "2026-07-15",
+        "status": "open",
+        "issue_type": "payouts",
+        "category": {
+          "id": "payouts",
+          "name": "Withdrawal Issues",
+          "icon": "fa-money-bill-wave"
+        },
+        "upvotes": 24,
+        "replies_count": 3,
+        "user": {
+          "login": "john_d",
+          "display_name": "John D"
+        },
+        "casino": {
+          "slug": "funrize",
+          "title": "Funrize",
+          "rating": 8.5,
+          "color": "bg-purple",
+          "type": "casino"
+        },
+        "state": {
+          "slug": "california",
+          "title": "California"
+        }
+      }
+    ]
+  }
+}
+
+
+Что НЕ нужно на первом этапе
+----------------------------
+- Отдельные эндпоинты для казино/жалоб штата
+- Пагинация
+- Фильтрация/сортировка на бэке
+- Провайдеры

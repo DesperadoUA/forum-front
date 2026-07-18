@@ -15,13 +15,15 @@
           </div>
         </div>
 
+        <p v-if="errorMsg" class="form-error">{{ errorMsg }}</p>
+
         <form @submit.prevent="submit">
           <div class="form-group">
-            <label for="login-email">Email Address *</label>
+            <label for="login-email">Email or Username *</label>
             <input
               id="login-email"
-              v-model="email"
-              type="email"
+              v-model="loginOrEmail"
+              type="text"
               placeholder="your@email.com"
               required
             />
@@ -42,8 +44,9 @@
             <a href="#">Forgot password?</a>
           </div>
 
-          <button type="submit" class="btn-primary full-width">
-            <i class="fas fa-sign-in-alt"></i> Log In
+          <button type="submit" class="btn-primary full-width" :disabled="pending">
+            <i class="fas fa-sign-in-alt"></i>
+            {{ pending ? 'Logging in...' : 'Log In' }}
           </button>
         </form>
       </div>
@@ -53,20 +56,58 @@
 
 <script setup lang="ts">
 import { ref } from 'vue'
+import type { ApiResponse } from '~/types/api/main'
+import { useAuth } from '~/composables/useAuth'
 
 defineProps<{ isOpen: boolean }>()
 const emit = defineEmits(['close', 'switch-to-register'])
 
-const email = ref('')
+const config = useRuntimeConfig()
+const { setToken } = useAuth()
+
+const loginOrEmail = ref('')
 const password = ref('')
+const pending = ref(false)
+const errorMsg = ref('')
 
 function close() {
+  errorMsg.value = ''
   emit('close')
 }
 
-function submit() {
-  // auth logic placeholder
-  close()
+async function submit() {
+  pending.value = true
+  errorMsg.value = ''
+
+  try {
+    const res = await $fetch<ApiResponse<{ accessToken: string }>>('/auth/login', {
+      baseURL: config.public.apiBase as string,
+      method: 'POST',
+      body: {
+        loginOrEmail: loginOrEmail.value,
+        password: password.value,
+      },
+    })
+
+    if (res.status !== 'ok' || !res.body?.accessToken) {
+      errorMsg.value = Array.isArray(res.errors) && res.errors.length
+        ? String(res.errors[0])
+        : 'Login failed'
+      return
+    }
+
+    setToken(res.body.accessToken)
+    loginOrEmail.value = ''
+    password.value = ''
+    close()
+  } catch (e: unknown) {
+    const err = e as { data?: { errors?: unknown[] } }
+    errorMsg.value = Array.isArray(err.data?.errors) && err.data.errors.length
+      ? String(err.data.errors[0])
+      : 'Login failed'
+  } finally {
+    pending.value = false
+  }
 }
 </script>
 
@@ -121,5 +162,11 @@ function submit() {
 
 .forgot a:hover {
   color: var(--accent-gold);
+}
+
+.form-error {
+  color: var(--status-open);
+  margin-bottom: 16px;
+  font-size: 0.875rem;
 }
 </style>
