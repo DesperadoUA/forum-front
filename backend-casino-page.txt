@@ -1,0 +1,269 @@
+Ожидания фронта от бэка для посадочной страницы казино
+================================================================
+
+URL на фронте и API
+-------------------
+/casino/:slug
+
+Примеры:
+  /casino/funrize
+  /casino/chumba
+  /casino/stake-us
+
+slug — тот же, что в GET /pages/casinos (поле slug).
+
+
+Эндпоинт бэка
+-------------
+GET /casino/:slug
+
+Пример:
+  GET /casino/funrize
+
+Список казино по-прежнему:
+  GET /pages/casinos
+
+
+Формат ответа
+-------------
+{
+  "errors": [],
+  "status": "ok",
+  "body": {
+    "seo_title": "Funrize Complaints & Reviews | Sweeps",
+    "seo_description": "...",
+    "seo_h1": "Funrize",
+    "casino": { ... },
+    "complaints_count": 45,
+    "resolved_count": 32,
+    "resolution_rate": 71,
+    "states": [ ... ],
+    "providers": [ "Pragmatic Play", "NetEnt" ],
+    "complaints": [ ... ]
+  }
+}
+
+При ошибке:
+{
+  "errors": ["CASINO_NOT_FOUND"],
+  "status": "error",
+  "body": null
+}
+
+
+Поля body
+---------
+seo_title        — для <title>
+seo_description  — для meta description
+seo_h1           — заголовок на странице (название казино)
+casino           — объект казино (см. ниже)
+complaints_count — число жалоб для шапки
+resolved_count   — число resolved-жалоб
+resolution_rate  — процент resolved (0–100), можно считать на бэке
+states           — штаты для фильтра "Filter by State"
+providers        — провайдеры для тегов в шапке
+complaints       — список жалоб по этому казино
+
+
+Объект casino
+-------------
+Минимум — поля из GET /pages/casinos + описание:
+
+{
+  "slug": "funrize",
+  "title": "Funrize",
+  "type": "casino",
+  "color": "bg-purple",
+  "offer": "3,600 Entries FREE + 1.225M Coins",
+  "rating": 8.5,
+  "stars": 4.5,
+  "description": "Popular social casino with generous welcome bonuses"
+}
+
+Поля:
+  slug        — идентификатор в URL
+  title       — название
+  type        — "casino" | "sportsbook"
+  color       — CSS-класс для лого (bg-purple, bg-black, ...)
+  offer       — оффер или null
+  rating      — рейтинг /10
+  stars       — звёзды /5
+  description — краткое описание (опционально, если есть в БД)
+
+
+Массив states[] (для фильтра по штату)
+--------------------------------------
+Штаты, в которых доступно казино и по которым есть/могут быть жалобы:
+
+[
+  {
+    "slug": "california",
+    "title": "California"
+  },
+  {
+    "slug": "texas",
+    "title": "Texas"
+  }
+]
+
+Фронт использует:
+  slug  — value в select
+  title — label в select
+
+
+Массив providers[]
+------------------
+Список названий провайдеров для тегов в шапке:
+
+["Pragmatic Play", "NetEnt", "Hacksaw Gaming"]
+
+
+Массив complaints[]
+-------------------
+Тот же формат, что в GET /pages/main, GET /pages/recent, GET /complaints:
+
+{
+  "id": 1,
+  "slug": "withdrawal-delayed-over-3-weeks",
+  "title": "Withdrawal Delayed Over 3 Weeks",
+  "content": "...",
+  "created_at": "2026-07-15T08:42:14.431Z",
+  "date": "2026-07-15",
+  "status": "open",
+  "issue_type": "withdrawal",
+  "category": {
+    "id": "withdrawal",
+    "name": "Withdrawal Issues",
+    "icon": "fa-money-bill-wave"
+  },
+  "upvotes": 24,
+  "replies_count": 3,
+  "user": {
+    "login": "john_d",
+    "display_name": "John D"
+  },
+  "casino": {
+    "slug": "funrize",
+    "title": "Funrize",
+    "rating": 8.5,
+    "color": "bg-purple",
+    "type": "casino"
+  },
+  "state": {
+    "slug": "california",
+    "title": "California"
+  }
+}
+
+Важно: в complaints[].state должен быть slug штата — фронт фильтрует жалобы по state.slug.
+
+
+Что рендерит фронт (по HTML-макету)
+------------------------------------
+1. Breadcrumbs: Home > All Casinos > {casino.title}
+2. Шапка казино:
+   - название
+   - rating /10
+   - complaints_count
+   - resolution_rate %
+   - type (casino / sportsbook)
+   - теги providers[]
+   - кнопка "File Complaint"
+3. Фильтр по штату (states[])
+4. Заголовок "Complaints (N)" + SortSelect
+5. Список ComplaintCard
+
+
+Логика на фронте (бэку не обязательно)
+---------------------------------------
+Сортировка и фильтр делаются на клиенте, как на /recent:
+
+SortSelect:
+  - newest      — по date DESC
+  - oldest      — по date ASC
+  - mostVoted   — по upvotes DESC
+  - open        — status === "open"
+  - resolved    — status === "resolved"
+
+StateFilter:
+  - пустое значение — все жалобы
+  - выбран slug штата — complaints.filter(c => c.state.slug === selectedState)
+
+Query-параметры на бэке НЕ обязательны.
+Опционально позже:
+  ?state=california
+  ?sort=newest
+
+
+Пример полного ответа
+---------------------
+GET /casino/funrize
+
+{
+  "errors": [],
+  "status": "ok",
+  "body": {
+    "seo_title": "Funrize Complaints & Reviews | Sweeps",
+    "seo_description": "Read player complaints and reviews about Funrize.",
+    "seo_h1": "Funrize",
+    "casino": {
+      "slug": "funrize",
+      "title": "Funrize",
+      "type": "casino",
+      "color": "bg-purple",
+      "offer": "3,600 Entries FREE + 1.225M Coins",
+      "rating": 8.5,
+      "stars": 4.5,
+      "description": "Popular social casino with generous welcome bonuses"
+    },
+    "complaints_count": 2,
+    "resolved_count": 1,
+    "resolution_rate": 50,
+    "states": [
+      { "slug": "california", "title": "California" },
+      { "slug": "texas", "title": "Texas" }
+    ],
+    "providers": ["Pragmatic Play", "NetEnt"],
+    "complaints": [
+      {
+        "id": 1,
+        "slug": "withdrawal-delayed-over-3-weeks",
+        "title": "Withdrawal Delayed Over 3 Weeks",
+        "content": "Documents uploaded 3 days ago, still pending review.",
+        "created_at": "2026-07-15T08:42:14.431Z",
+        "date": "2026-07-15",
+        "status": "open",
+        "issue_type": "withdrawal",
+        "category": {
+          "id": "withdrawal",
+          "name": "Withdrawal Issues",
+          "icon": "fa-money-bill-wave"
+        },
+        "upvotes": 24,
+        "replies_count": 3,
+        "user": {
+          "login": "john_d",
+          "display_name": "John D"
+        },
+        "casino": {
+          "slug": "funrize",
+          "title": "Funrize",
+          "rating": 8.5,
+          "color": "bg-purple",
+          "type": "casino"
+        },
+        "state": {
+          "slug": "california",
+          "title": "California"
+        }
+      }
+    ]
+  }
+}
+
+
+Что НЕ нужно на первом этапе
+----------------------------
+- Отдельный эндпоинт для списка жалоб казино
+- Пагинация (можно добавить позже через ?page=&limit=)
+- Фильтрация/сортировка на бэке

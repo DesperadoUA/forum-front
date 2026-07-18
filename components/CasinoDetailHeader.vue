@@ -8,7 +8,7 @@
         <div class="meta-tag"><i class="fas fa-check-circle"></i> {{ resolutionRate }}% Resolved</div>
         <div class="meta-tag"><i class="fas fa-tag"></i> {{ casino.type }}</div>
       </div>
-      <div class="casino-tags">
+      <div v-if="casino.providers?.length" class="casino-tags">
         <span v-for="tag in casino.providers" :key="tag" class="tag">{{ tag }}</span>
       </div>
     </div>
@@ -49,7 +49,6 @@ defineEmits(['file-complaint'])
 .casino-detail-meta {
   display: flex;
   gap: 15px;
-  margin-bottom: 20px;
   flex-wrap: wrap;
 }
 
@@ -68,6 +67,7 @@ defineEmits(['file-complaint'])
   display: flex;
   gap: 10px;
   flex-wrap: wrap;
+  margin-top: 20px;
 }
 
 .tag {

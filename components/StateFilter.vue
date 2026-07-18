@@ -7,17 +7,29 @@
         <p>Show complaints from specific state or view all</p>
       </div>
     </div>
-    <select :value="modelValue" class="state-select" @change="$emit('update:modelValue', ($event.target as HTMLSelectElement).value)">
+    <select
+      :value="modelValue"
+      class="state-select"
+      @change="$emit('update:modelValue', ($event.target as HTMLSelectElement).value)"
+    >
       <option value="">All States</option>
-      <option v-for="state in states" :key="state" :value="state">{{ state }}</option>
+      <option
+        v-for="state in states"
+        :key="state.slug"
+        :value="state.slug"
+      >
+        {{ state.title }}
+      </option>
     </select>
   </div>
 </template>
 
 <script setup lang="ts">
+import type { ApiCasinoState } from '~/types/api/casino'
+
 defineProps<{
   modelValue: string
-  states: string[]
+  states: ApiCasinoState[]
 }>()
 
 defineEmits(['update:modelValue'])
